@@ -11,6 +11,10 @@ using Microsoft.Extensions.DependencyInjection;
 using ApiToken.Data;
 using ApiToken.Models;
 using ApiToken.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using ApiToken.Helpers;
+using System.Text;
 
 namespace ApiToken
 {
@@ -35,6 +39,25 @@ namespace ApiToken
 
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
+
+            services.AddAuthentication()
+                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, config =>
+                 {
+                     var key = Configuration[WebConstants.TOKEN_KEY];
+
+                     config.TokenValidationParameters = new TokenValidationParameters()
+                     {
+                         ValidateIssuer = true,
+                         ValidateAudience = true,
+                         ValidateLifetime = true,
+                         ValidateIssuerSigningKey = true,
+                         ValidIssuer = Configuration[WebConstants.TOKEN_ISSUER],
+                         ValidAudience = Configuration[WebConstants.TOKEN_AUDIENCE],
+                         IssuerSigningKey = new SymmetricSecurityKey(
+                                             Encoding.UTF8.GetBytes(key))
+                     };
+                 });
+
 
             services.AddMvc();
         }
