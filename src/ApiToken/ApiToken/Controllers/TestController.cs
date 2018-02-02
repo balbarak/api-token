@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -16,7 +17,8 @@ namespace ApiToken.Controllers
             return Ok(new
             {
                 Message = "You are authroized !!",
-                Name = User.Identity.Name
+                Name = User.Identity.Name,
+                Version = User.Claims.Where(a=> a.Type == ClaimTypes.Version).FirstOrDefault().Value
             });
         }
     }
